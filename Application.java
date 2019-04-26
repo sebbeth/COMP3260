@@ -72,25 +72,6 @@ public class Application {
                 text[i] = (byte) Integer.parseInt(textLine.substring(i * 8, i * 8 + 8), 2);
                 key[i] = (byte) Integer.parseInt(keyLine.substring(i * 8, i * 8 + 8), 2);
             }
-
-            // String binaryText = "";
-            // String hexText = "";
-            // String binaryKey = "";
-            // String hexKey = "";
-
-            // for (int i = 0; i < 16; i++) {
-            // binaryText += String.format("%8s", Integer.toBinaryString(text[i] &
-            // 0xFF)).replace(' ', '0');
-            // hexText += String.format("%02X", text[i]);
-            // binaryKey += String.format("%8s", Integer.toBinaryString(key[i] &
-            // 0xFF)).replace(' ', '0');
-            // hexKey += String.format("%02X", key[i]);
-            // }
-            // System.out.println("Text back to binary " + binaryText);
-            // System.out.println("Key back to binary " + binaryKey);
-            // System.out.println("Text to hex " + hexText);
-            // System.out.println("Key to hex " + hexKey);
-
         } catch (Exception e) {
             throw new Exception(e);
         } finally {

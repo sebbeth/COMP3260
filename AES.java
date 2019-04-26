@@ -1,5 +1,5 @@
 public class AES {
-    protected static int numOfRounds = 2;
+    protected static int numOfRounds = 10;
 
     protected static String[][] sBox = new String[][] {
             { "63", "7c", "77", "7b", "f2", "6b", "6f", "c5", "30", "01", "67", "2b", "fe", "d7", "ab", "76" },
@@ -29,62 +29,90 @@ public class AES {
 
     }
 
-    // Accepts the encryption input as raw strings and converts them here to the
-    // byte arrays.
+    // Provides string to byte conversion and back for encryption.
     public String[] encrypt(String plaintext, String key) {
-        byte[] bytePlainText = new byte[16];
-        byte[] byteKey = new byte[16];
-
-        for (int i = 0; i < 16; i++) {
-            bytePlainText[i] = (byte) Integer.parseInt(plaintext.substring(i * 8, i * 8 + 8), 2);
-            byteKey[i] = (byte) Integer.parseInt(key.substring(i * 8, i * 8 + 8), 2);
-        }
+        byte[] bytePlainText = stringToByteArray(plaintext);
+        byte[] byteKey = stringToByteArray(key);
 
         byte[][] byteResults = encrypt(bytePlainText, byteKey);
-        String[] stringResults = new String[numOfRounds];
+        String[] stringResults = new String[numOfRounds + 1];
 
-        for (int i = 0; i < numOfRounds; i++) {
-            String binaryText = "";
-
-            for (int j = 0; j < 16; j++) {
-                binaryText += String.format("%8s", Integer.toBinaryString(byteResults[i][j] & 0xFF)).replace(' ', '0');
-            }
-            stringResults[i] = binaryText;
+        for (int i = 0; i < numOfRounds + 1; i++) {
+            stringResults[i] = byteArrayToString(byteResults[i]);
         }
         return stringResults;
     }
 
-    // This method is the one to get extended.
+    // Accepts 16-byte text and key arrays, encrypts them according to AES and
+    // returns all intermediary results.
     public byte[][] encrypt(byte[] plaintext, byte[] key) {
-        // Run through the first nine standard rounds
-        // Perform the custom tenth round.
-        byte[][] tempResults = new byte[16][numOfRounds];
-        tempResults[0] = plaintext;
-        tempResults[1] = key;
-        return tempResults;
+        byte[][] subKeys = generateKeys(key);
+
+        byte[][] results = new byte[16][numOfRounds + 1];
+        results[0] = plaintext;
+
+        for (int i = 0; i < numOfRounds - 1; i++) {
+            byte[] intermediaryResult = results[i];
+            intermediaryResult = substituteBytes(intermediaryResult);
+            intermediaryResult = shiftRows(intermediaryResult);
+            intermediaryResult = mixColumns(intermediaryResult);
+            intermediaryResult = addRoundKey(intermediaryResult, subKeys[i]);
+            results[i + 1] = intermediaryResult;
+        }
+
+        byte[] finalResult = results[9];
+        finalResult = substituteBytes(finalResult);
+        finalResult = shiftRows(finalResult);
+        finalResult = addRoundKey(finalResult, subKeys[9]);
+        results[10] = finalResult;
+
+        return results;
     }
 
     // public decrypt() {
 
     // }
 
-    // protected substituteBytes() {
+    protected byte[] substituteBytes(byte[] text) {
+        return text;
+    }
 
-    // }
+    protected byte[] shiftRows(byte[] text) {
+        return text;
+    }
 
-    // protected shiftRows() {
+    protected byte[] mixColumns(byte[] text) {
+        return text;
+    }
 
-    // }
+    protected byte[] addRoundKey(byte[] text, byte[] key) {
+        return text;
+    }
 
-    // protected mixColumns() {
+    protected byte[][] generateKeys(byte[] masterKey) {
+        byte[][] subKeys = new byte[16][numOfRounds];
+        for (int i = 0; i < numOfRounds; i++) {
+            subKeys[i] = masterKey;
+        }
+        return subKeys;
+    }
 
-    // }
+    protected byte[] stringToByteArray(String input) {
+        byte[] output = new byte[16];
 
-    // protected addRoundKey() {
+        for (int i = 0; i < 16; i++) {
+            output[i] = (byte) Integer.parseInt(input.substring(i * 8, i * 8 + 8), 2);
+        }
 
-    // }
+        return output;
+    }
 
-    // protected generateKeys() {
-
-    // }
+    protected String byteArrayToString(byte[] input) {
+        String output = "";
+        for (int i = 0; i < 16; i++) {
+            output += String.format("%8s", Integer.toBinaryString(input[i] & 0xFF)).replace(' ', '0');
+            // hexText += String.format("%02X", byteResults[i][j]);
+        }
+        return output;
+    }
 }
