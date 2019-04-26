@@ -12,11 +12,13 @@ enum cryptMode {
 public class Application {
 
     private static cryptMode modeOfOperation;
-    private static byte[] text;
-    private static byte[] key;
+    private static byte[] text = new byte[16];
+    private static byte[] key = new byte[16];
+
+    private static String rawText;
+    private static String rawKey;
 
     public Application() {
-        
     }
 
     public static void main(String[] args) {
@@ -56,21 +58,39 @@ public class Application {
 
         try {
             dataFile = new Scanner(new File(fileName));
-            String line1 = dataFile.nextLine();
-            System.out.println(line1);
-            
-            BigInteger textBigInt = new BigInteger(line1, 2);
-            System.out.println(textBigInt);
-            text = textBigInt.toByteArray();
-            
-            String line2 = dataFile.nextLine();
-            System.out.println(line2);
-            key = new BigInteger(line2, 2).toByteArray();
-            
-            System.out.println(Arrays.toString(text));
-            System.out.println(Arrays.toString(key));
+            String textLine = dataFile.nextLine();
+            String keyLine = dataFile.nextLine();
 
-            // Add to local variables
+            rawText = textLine;
+            rawKey = keyLine;
+
+            System.out.println(textLine);
+            System.out.println(keyLine);
+
+            for (int i = 0; i < 16; i++) {
+                // System.out.println(i + " " + textLine.substring(i, i+8));
+                text[i] = (byte) Integer.parseInt(textLine.substring(i * 8, i * 8 + 8), 2);
+                key[i] = (byte) Integer.parseInt(keyLine.substring(i * 8, i * 8 + 8), 2);
+            }
+
+            // String binaryText = "";
+            // String hexText = "";
+            // String binaryKey = "";
+            // String hexKey = "";
+
+            // for (int i = 0; i < 16; i++) {
+            // binaryText += String.format("%8s", Integer.toBinaryString(text[i] &
+            // 0xFF)).replace(' ', '0');
+            // hexText += String.format("%02X", text[i]);
+            // binaryKey += String.format("%8s", Integer.toBinaryString(key[i] &
+            // 0xFF)).replace(' ', '0');
+            // hexKey += String.format("%02X", key[i]);
+            // }
+            // System.out.println("Text back to binary " + binaryText);
+            // System.out.println("Key back to binary " + binaryKey);
+            // System.out.println("Text to hex " + hexText);
+            // System.out.println("Key to hex " + hexKey);
+
         } catch (Exception e) {
             throw new Exception(e);
         } finally {
@@ -81,7 +101,13 @@ public class Application {
     }
 
     private static void processEncryption() {
-
+        AES vanillaAES = new AES();
+        // For each of the 128 variations of the text and key
+        // Encrypt the text and key in the five variations.
+        // byte[][] results = vanillaAES.encrypt(text, key);
+        String[] results = vanillaAES.encrypt(rawText, rawKey);
+        System.out.println("Printing results of encryption");
+        System.out.println(Arrays.toString(results));
     }
 
     private static void processDecryption() {

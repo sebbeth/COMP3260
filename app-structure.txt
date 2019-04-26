@@ -10,6 +10,7 @@ Class method structure:
 	AES (each variant extends the encrypt/decrypt function to change which methods get called):
 		Public - encrypt(128-bit plaintext, 128-bit key), returns array of all round results.
 		Public - decrypt(128-bit ciphertext, 128-bit key), returns array of all round results.
+		SubstituteBytes
 		ShiftRows
 		MixColumns
 		AddRoundKey
