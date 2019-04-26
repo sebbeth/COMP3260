@@ -1,3 +1,7 @@
+enum Direction {
+    LEFT, RIGHT
+}
+
 public class AES {
     protected static int numOfRounds = 10;
 
@@ -54,7 +58,7 @@ public class AES {
         for (int i = 0; i < numOfRounds - 1; i++) {
             byte[] intermediaryResult = results[i];
             intermediaryResult = substituteBytes(intermediaryResult);
-            intermediaryResult = shiftRows(intermediaryResult);
+            intermediaryResult = shiftRows(intermediaryResult, Direction.LEFT);
             intermediaryResult = mixColumns(intermediaryResult);
             intermediaryResult = addRoundKey(intermediaryResult, subKeys[i]);
             results[i + 1] = intermediaryResult;
@@ -62,7 +66,7 @@ public class AES {
 
         byte[] finalResult = results[9];
         finalResult = substituteBytes(finalResult);
-        finalResult = shiftRows(finalResult);
+        finalResult = shiftRows(finalResult, Direction.LEFT);
         finalResult = addRoundKey(finalResult, subKeys[9]);
         results[10] = finalResult;
 
@@ -77,8 +81,39 @@ public class AES {
         return text;
     }
 
-    protected byte[] shiftRows(byte[] text) {
-        return text;
+    protected byte[] shiftRows(byte[] text, Direction direction) {
+        byte[] result = new byte[16];
+        for (int i = 0; i < 4; i++) {
+            switch (direction) {
+            case LEFT:
+                result[i] = text[(i + (i * 4)) % 16];
+                System.out.println((i) + " " + (i + (i * 4)) % 16);
+
+                result[i + 4] = text[(i + 4 + (i * 4)) % 16];
+                System.out.println((i + 4) + " " + (i + 4 + (i * 4)) % 16);
+
+                result[i + 8] = text[(i + 8 + (i * 4)) % 16];
+                System.out.println((i + 8) + " " + (i + 8 + (i * 4)) % 16);
+
+                result[i + 12] = text[(i + 12 + (i * 4)) % 16];
+                System.out.println((i + 12) + " " + (i + 12 + (i * 4)) % 16);
+                break;
+            case RIGHT:
+                result[i] = text[((i - (i * 4)) + 16) % 16];
+                System.out.println((i) + " " + ((i - (i * 4)) + 16) % 16);
+
+                result[i + 4] = text[((i + 4 - (i * 4)) + 16) % 16];
+                System.out.println((i + 4) + " " + ((i + 4 - (i * 4)) + 16) % 16);
+
+                result[i + 8] = text[((i + 8 - (i * 4)) + 16) % 16];
+                System.out.println((i + 8) + " " + ((i + 8 - (i * 4)) + 16) % 16);
+
+                result[i + 12] = text[((i + 12 - (i * 4)) + 16) % 16];
+                System.out.println((i + 12) + " " + ((i + 12 - (i * 4)) + 16) % 16);
+                break;
+            }
+        }
+        return result;
     }
 
     protected byte[] mixColumns(byte[] text) {
