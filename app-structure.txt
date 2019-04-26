@@ -1,0 +1,22 @@
+Create six classes:
+	Application
+	AES
+	AES1
+	AES2
+	AES3
+	AES4
+
+Class method structure:
+	AES (each variant extends the encrypt/decrypt function to change which methods get called):
+		Public - encrypt(128-bit plaintext, 128-bit key), returns array of all round results.
+		Public - decrypt(128-bit ciphertext, 128-bit key), returns array of all round results.
+		ShiftRows
+		MixColumns
+		AddRoundKey
+
+	Application (cmd line args accept an input file and the mode of operation (e/d):
+		LoadData(loads from file)
+		ProcessEncryption - processes initial encryption, along with all 127 variants of Pi and Ki.
+		ProcessDecryption - process decryption
+		OutputEncryptionResults - outputs the encrypted data, along with all calculated bit differences between base encryption and all variations
+		OutputDecryptionResults - outputs the decrypted data
