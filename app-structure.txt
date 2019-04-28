@@ -23,7 +23,7 @@ Class method structure:
 		OutputDecryptionResults - outputs the decrypted data
 
 Implement core AES program encryption
-	Substitute bytes
+	Substitute bytes - DONE
 	Shift rows - DONE
 	Mix Columns
 	Generate round keys
