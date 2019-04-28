@@ -22,35 +22,44 @@ public class Application {
     }
 
     public static void main(String[] args) {
-        if (args.length > 0) {
-            try {
-                switch (args[0]) {
-                case "-e":
-                case "-E":
-                    modeOfOperation = cryptMode.ENCRYPT;
-                    break;
-                case "-d":
-                case "-D":
-                    modeOfOperation = cryptMode.DECRYPT;
-                    break;
-                default:
-                    throw new IllegalArgumentException(
-                            "No valid mode of operation was used. Please enter '-e' for encryption or '-d' for decryption.");
-                }
-
-                loadData(args[1]);
-
-                if (modeOfOperation == cryptMode.ENCRYPT) {
-                    processEncryption();
-                } else if (modeOfOperation == cryptMode.DECRYPT) {
-                    processDecryption();
-                }
-            } catch (Exception e) {
-                System.out.println("Error: " + e);
-            }
-        } else {
-            System.out.println("No file provided. Ending program.\n");
+        try {
+            modeOfOperation = cryptMode.ENCRYPT;
+            loadData("input.txt");
+            processEncryption();
+        } catch (Exception e) {
+            System.out.println(e);
         }
+
+        // if (args.length > 0) {
+        // try {
+        // switch (args[0]) {
+        // case "-e":
+        // case "-E":
+        // modeOfOperation = cryptMode.ENCRYPT;
+        // break;
+        // case "-d":
+        // case "-D":
+        // modeOfOperation = cryptMode.DECRYPT;
+        // break;
+        // default:
+        // throw new IllegalArgumentException(
+        // "No valid mode of operation was used. Please enter '-e' for encryption or
+        // '-d' for decryption.");
+        // }
+
+        // loadData(args[1]);
+
+        // if (modeOfOperation == cryptMode.ENCRYPT) {
+        // processEncryption();
+        // } else if (modeOfOperation == cryptMode.DECRYPT) {
+        // processDecryption();
+        // }
+        // } catch (Exception e) {
+        // System.out.println("Error: " + e);
+        // }
+        // } else {
+        // System.out.println("No file provided. Ending program.\n");
+        // }
     }
 
     private static void loadData(String fileName) throws Exception {
@@ -87,17 +96,17 @@ public class Application {
         // Encrypt the text and key in the five variations.
         // byte[][] results = vanillaAES.encrypt(text, key);
         String[] results = vanillaAES.encrypt(rawText, rawKey);
+        outputEncryptionResults(results);
+    }
+
+    // private static void processDecryption() {
+
+    // }
+
+    private static void outputEncryptionResults(String[] results) {
         System.out.println("Printing results of encryption");
         System.out.println(Arrays.toString(results));
     }
-
-    private static void processDecryption() {
-
-    }
-
-    // private static void outputEncryptionResults() {
-
-    // }
 
     // private static void outputDecryptionResults() {
 

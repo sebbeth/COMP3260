@@ -24,7 +24,7 @@ Class method structure:
 
 Implement core AES program encryption
 	Substitute bytes
-	Shift rows
+	Shift rows - DONE
 	Mix Columns
 	Generate round keys
 	Add round keys

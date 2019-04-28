@@ -78,7 +78,7 @@ public class AES {
 
         for (int i = 0; i < numOfRounds - 1; i++) {
             byte[] intermediaryResult = results[i];
-            intermediaryResult = substituteBytes(intermediaryResult);
+            intermediaryResult = substituteBytes(intermediaryResult, sBox);
             intermediaryResult = shiftRows(intermediaryResult, Direction.LEFT);
             intermediaryResult = mixColumns(intermediaryResult);
             intermediaryResult = addRoundKey(intermediaryResult, subKeys[i]);
@@ -86,7 +86,7 @@ public class AES {
         }
 
         byte[] finalResult = results[9];
-        finalResult = substituteBytes(finalResult);
+        finalResult = substituteBytes(finalResult, sBox);
         finalResult = shiftRows(finalResult, Direction.LEFT);
         finalResult = addRoundKey(finalResult, subKeys[9]);
         results[10] = finalResult;
@@ -98,8 +98,20 @@ public class AES {
 
     // }
 
-    protected byte[] substituteBytes(byte[] text) {
-        return text;
+    protected byte[] substituteBytes(byte[] text, String[][] matrix) {
+        // convert text byte into hex representation
+        System.out.println("Substituting bytes");
+        byte[] substitutedText = new byte[16];
+        for (int i = 0; i < 16; i++) {
+            String hexByte = String.format("%02X", text[i]).toLowerCase();
+            System.out.println("Hexbyte: " + hexByte);
+            String subByte = matrix[Integer.parseInt(hexByte.substring(0, 1), 16)][Integer.parseInt(hexByte.substring(1, 2), 16)];
+            substitutedText[i] = (byte)Integer.parseInt(subByte, 16);
+            System.out.println("Converted byte: " + String.format("%02X", substitutedText[i]).toLowerCase());
+        }
+        // map bytes to 16 substituted bytes
+        // map text hex back into bytes
+        return substitutedText;
     }
 
     protected byte[] shiftRows(byte[] text, Direction direction) {
@@ -108,29 +120,29 @@ public class AES {
             switch (direction) {
             case LEFT:
                 result[i] = text[(i + (i * 4)) % 16];
-                System.out.println((i) + " " + (i + (i * 4)) % 16);
+                // System.out.println((i) + " " + (i + (i * 4)) % 16);
 
                 result[i + 4] = text[(i + 4 + (i * 4)) % 16];
-                System.out.println((i + 4) + " " + (i + 4 + (i * 4)) % 16);
+                // System.out.println((i + 4) + " " + (i + 4 + (i * 4)) % 16);
 
                 result[i + 8] = text[(i + 8 + (i * 4)) % 16];
-                System.out.println((i + 8) + " " + (i + 8 + (i * 4)) % 16);
+                // System.out.println((i + 8) + " " + (i + 8 + (i * 4)) % 16);
 
                 result[i + 12] = text[(i + 12 + (i * 4)) % 16];
-                System.out.println((i + 12) + " " + (i + 12 + (i * 4)) % 16);
+                // System.out.println((i + 12) + " " + (i + 12 + (i * 4)) % 16);
                 break;
             case RIGHT:
                 result[i] = text[((i - (i * 4)) + 16) % 16];
-                System.out.println((i) + " " + ((i - (i * 4)) + 16) % 16);
+                // System.out.println((i) + " " + ((i - (i * 4)) + 16) % 16);
 
                 result[i + 4] = text[((i + 4 - (i * 4)) + 16) % 16];
-                System.out.println((i + 4) + " " + ((i + 4 - (i * 4)) + 16) % 16);
+                // System.out.println((i + 4) + " " + ((i + 4 - (i * 4)) + 16) % 16);
 
                 result[i + 8] = text[((i + 8 - (i * 4)) + 16) % 16];
-                System.out.println((i + 8) + " " + ((i + 8 - (i * 4)) + 16) % 16);
+                // System.out.println((i + 8) + " " + ((i + 8 - (i * 4)) + 16) % 16);
 
                 result[i + 12] = text[((i + 12 - (i * 4)) + 16) % 16];
-                System.out.println((i + 12) + " " + ((i + 12 - (i * 4)) + 16) % 16);
+                // System.out.println((i + 12) + " " + ((i + 12 - (i * 4)) + 16) % 16);
                 break;
             }
         }
