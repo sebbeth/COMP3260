@@ -21,3 +21,17 @@ Class method structure:
 		ProcessDecryption - process decryption
 		OutputEncryptionResults - outputs the encrypted data, along with all calculated bit differences between base encryption and all variations
 		OutputDecryptionResults - outputs the decrypted data
+
+Implement core AES program encryption
+	Substitute bytes
+	Shift rows
+	Mix Columns
+	Generate round keys
+	Add round keys
+Test core AES program
+Implement core AES decryption
+
+Implement variations of AES
+Implement variations of the input text and key
+Print out all information
+Add in full commenting
