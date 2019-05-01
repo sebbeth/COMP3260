@@ -4,11 +4,11 @@
  * 
  */
 import java.util.*;
-import java.io.*;
+// import java.io.*;
 
 public class Tester {
 
-    private static cryptMode modeOfOperation;
+    // private static cryptMode modeOfOperation;
 
 
     public static void main(String args[]) {
@@ -26,14 +26,14 @@ public class Tester {
             String plaintext = generateBitString(plaintextLength);
             String key = generateBitString(keyLength);
             // Encrypt the plaintext
-            modeOfOperation = cryptMode.ENCRYPT;
+            // modeOfOperation = cryptMode.ENCRYPT;
             Application.testLoadData(plaintext,key);
             String[] encryptionResults = Application.processEncryption();
             System.out.println(Arrays.toString(encryptionResults));
 
             String cipherText = encryptionResults[0];
             // Now decrypt the plaintext
-            modeOfOperation = cryptMode.DECRYPT;
+            // modeOfOperation = cryptMode.DECRYPT;
             Application.testLoadData(cipherText,key);
             String[] decryptionResults = Application.processDecryption();
             System.out.println(Arrays.toString(decryptionResults));

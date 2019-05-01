@@ -22,43 +22,43 @@ public class Application {
     }
 
     public static void main(String[] args) {
-       
 
         if (args.length > 0) {
-        try {
-        switch (args[0]) {
-        case "-e":
-        case "-E":
-        modeOfOperation = cryptMode.ENCRYPT;
-        break;
-        case "-d":
-        case "-D":
-        modeOfOperation = cryptMode.DECRYPT;
-        break;
-        default:
-        throw new IllegalArgumentException(
-        "No valid mode of operation was used. Please enter '-e' for encryption or '-d' for decryption.");
-        }
+            try {
+                switch (args[0]) {
+                case "-e":
+                case "-E":
+                    modeOfOperation = cryptMode.ENCRYPT;
+                    break;
+                case "-d":
+                case "-D":
+                    modeOfOperation = cryptMode.DECRYPT;
+                    break;
+                default:
+                    throw new IllegalArgumentException(
+                            "No valid mode of operation was used. Please enter '-e' for encryption or '-d' for decryption.");
+                }
 
-        loadData(args[1]);
+                loadData(args[1]);
 
-        if (modeOfOperation == cryptMode.ENCRYPT) {
-        processEncryption();
-        } else if (modeOfOperation == cryptMode.DECRYPT) {
-        //processDecryption();
-        }
-        } catch (Exception e) {
-        System.out.println("Error: " + e);
-        }
+                if (modeOfOperation == cryptMode.ENCRYPT) {
+                    processEncryption();
+                } else if (modeOfOperation == cryptMode.DECRYPT) {
+                    // processDecryption();
+                }
+            } catch (Exception e) {
+                System.out.println("Error: " + e);
+            }
         } else {
-        //System.out.println("No file provided. Ending program.\n");
-        try {
-            modeOfOperation = cryptMode.ENCRYPT;
-            loadData("input.txt");
+            // System.out.println("No file provided. Ending program.\n");
+            try {
+                modeOfOperation = cryptMode.ENCRYPT;
+                loadData("input.txt");
+            } catch (Exception e) {
+                System.out.println(e);
+            }
             processEncryption();
-        } catch (Exception e) {
-            System.out.println(e);
-        }
+
         }
     }
 
@@ -85,21 +85,38 @@ public class Application {
             rawText = textLine;
             rawKey = keyLine;
 
-            System.out.println(textLine);
-            System.out.println(keyLine);
+            rawText = hexToBinary(textLine);
+            rawKey = hexToBinary(keyLine);
 
-            for (int i = 0; i < 16; i++) {
-                // System.out.println(i + " " + textLine.substring(i, i+8));
-                text[i] = (byte) Integer.parseInt(textLine.substring(i * 8, i * 8 + 8), 2);
-                key[i] = (byte) Integer.parseInt(keyLine.substring(i * 8, i * 8 + 8), 2);
-            }
+            System.out.println(rawText);
+            System.out.println(rawKey);
+
+            // for (int i = 0; i < 16; i++) {
+            // // System.out.println(i + " " + textLine.substring(i, i+8));
+            // text[i] = (byte) Integer.parseInt(textLine.substring(i * 8, i * 8 + 8), 2);
+            // key[i] = (byte) Integer.parseInt(keyLine.substring(i * 8, i * 8 + 8), 2);
+            // }
         } catch (Exception e) {
             throw new Exception(e);
         } finally {
             if (dataFile != null) {
                 dataFile.close();
             }
+            System.out.println("Finished loading data");
         }
+    }
+
+    static String hexToBinary(String hex) {
+        String total = "";
+        for (int i = 0; i < hex.length(); i += 2) {
+            String res = Integer.toBinaryString(Integer.parseInt(hex.substring(i, i + 2), 16));
+            while (res.length() < 8) {
+                res = "0" + res;
+            }
+            System.out.println(res);
+            total += res;
+        }
+        return total;
     }
 
     public static String[] processEncryption() {
@@ -112,14 +129,14 @@ public class Application {
         return results;
     }
 
-     public static String[] processDecryption() {
-         String[] output = {"TODO IMPLEMENT DECRYPT"}; // TODO Replace this
+    public static String[] processDecryption() {
+        String[] output = { "TODO IMPLEMENT DECRYPT" }; // TODO Replace this
         return output;
-     }
+    }
 
     private static void outputEncryptionResults(String[] results) {
         System.out.println("Printing results of encryption");
-        String output = Arrays.toString(results).replace("[","").replace("]","");
+        String output = Arrays.toString(results).replace("[", "").replace("]", "");
         System.out.println(Arrays.toString(results));
         try {
             PrintWriter writer = new PrintWriter("output.txt", "UTF-8");
@@ -130,7 +147,7 @@ public class Application {
         }
     }
 
-     //private static void outputDecryptionResults() {
+    // private static void outputDecryptionResults() {
 
     // }
 }
