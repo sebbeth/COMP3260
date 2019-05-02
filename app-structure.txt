@@ -1,6 +1,7 @@
-Create six classes:
+Create seven classes:
 	Application
 	AES
+	AES0
 	AES1
 	AES2
 	AES3
@@ -26,10 +27,10 @@ Implement core AES program encryption
 	Substitute bytes - DONE
 	Shift rows - DONE
 	Mix Columns - DONE
-	Generate round keys
-	Add round keys
-Test core AES program
-Implement core AES decryption
+	Generate round keys - DONE
+	Add round keys - DONE
+Test core AES program - DONE
+Implement core AES decryption - DONE
 
 Implement variations of AES
 Implement variations of the input text and key

@@ -40,15 +40,17 @@ public class Application {
                 }
 
                 loadData(args[1]);
-
-                if (modeOfOperation == cryptMode.ENCRYPT) {
-                    processEncryption();
-                } else if (modeOfOperation == cryptMode.DECRYPT) {
-                    // processDecryption();
-                }
             } catch (Exception e) {
                 System.out.println("Error: " + e);
             }
+
+            if (modeOfOperation == cryptMode.ENCRYPT) {
+                processEncryption();
+                // testEnDec();
+            } else if (modeOfOperation == cryptMode.DECRYPT) {
+                processDecryption();
+            }
+
         } else {
             // System.out.println("No file provided. Ending program.\n");
             try {
@@ -58,7 +60,6 @@ public class Application {
                 System.out.println(e);
             }
             processEncryption();
-
         }
     }
 
@@ -85,57 +86,62 @@ public class Application {
             rawText = textLine;
             rawKey = keyLine;
 
+            // TODO remove, only needed while testing with hex input
             rawText = hexToBinary(textLine);
             rawKey = hexToBinary(keyLine);
 
             System.out.println(rawText);
             System.out.println(rawKey);
-
-            // for (int i = 0; i < 16; i++) {
-            // // System.out.println(i + " " + textLine.substring(i, i+8));
-            // text[i] = (byte) Integer.parseInt(textLine.substring(i * 8, i * 8 + 8), 2);
-            // key[i] = (byte) Integer.parseInt(keyLine.substring(i * 8, i * 8 + 8), 2);
-            // }
         } catch (Exception e) {
             throw new Exception(e);
         } finally {
             if (dataFile != null) {
                 dataFile.close();
             }
-            System.out.println("Finished loading data");
         }
     }
 
-    static String hexToBinary(String hex) {
-        String total = "";
-        for (int i = 0; i < hex.length(); i += 2) {
-            String res = Integer.toBinaryString(Integer.parseInt(hex.substring(i, i + 2), 16));
-            while (res.length() < 8) {
-                res = "0" + res;
-            }
-            System.out.println(res);
-            total += res;
-        }
-        return total;
-    }
+    // public static void testEnDec() {
+    // System.out.println("TESTING ENC DEC");
+    // AES vanillaAES = new AES0();
+    // String[] encryptedResults = vanillaAES.encrypt(rawText, rawKey);
+    // String[] decryptedResults = vanillaAES.decrypt(encryptedResults[9], rawKey);
+
+    // // System.out.println("Printing results of encryption");
+    // // for (int i = 0; i < encryptedResults.length; i++) {
+    // // System.out.println("Round " + (i + 1) + ": " +
+    // // binaryToHex(encryptedResults[i]));
+    // // }
+
+    // // System.out.println("Printing results of decryption");
+    // // for (int i = 0; i < decryptedResults.length; i++) {
+    // // System.out.println("Round " + (i + 1) + ": " +
+    // // binaryToHex(decryptedResults[i]));
+    // // }
+    // System.out.println("Raw Text: " + binaryToHex(rawText));
+    // System.out.println("Encrypted Text: " + binaryToHex(encryptedResults[9]));
+    // System.out.println("Decrypted Text: " + binaryToHex(decryptedResults[9]));
+    // }
 
     public static String[] processEncryption() {
-        AES vanillaAES = new AES();
-        // For each of the 128 variations of the text and key
-        // Encrypt the text and key in the five variations.
-        // byte[][] results = vanillaAES.encrypt(text, key);
+        AES vanillaAES = new AES0();
         String[] results = vanillaAES.encrypt(rawText, rawKey);
         outputEncryptionResults(results);
         return results;
     }
 
     public static String[] processDecryption() {
-        String[] output = { "TODO IMPLEMENT DECRYPT" }; // TODO Replace this
-        return output;
+        AES vanillaAES = new AES0();
+        String[] results = vanillaAES.decrypt(rawText, rawKey);
+        outputDecryptionResults(results);
+        return results;
     }
 
     private static void outputEncryptionResults(String[] results) {
         System.out.println("Printing results of encryption");
+        for (int i = 0; i < results.length; i++) {
+            System.out.println(binaryToHex(results[i]));
+        }
         String output = Arrays.toString(results).replace("[", "").replace("]", "");
         System.out.println(Arrays.toString(results));
         try {
@@ -147,7 +153,34 @@ public class Application {
         }
     }
 
-    // private static void outputDecryptionResults() {
+    private static void outputDecryptionResults(String[] results) {
+        System.out.println("DECRYPTION");
+        System.out.println(results[9]);
+    }
 
-    // }
+    private static String hexToBinary(String hex) {
+        String total = "";
+        for (int i = 0; i < hex.length(); i += 2) {
+            String res = Integer.toBinaryString(Integer.parseInt(hex.substring(i, i + 2), 16));
+            while (res.length() < 8) {
+                res = "0" + res;
+            }
+            total += res;
+        }
+        return total;
+    }
+
+    private static String binaryToHex(String binary) {
+        String total = "";
+        for (int i = 0; i < binary.length(); i += 8) {
+            int decimal = Integer.parseInt(binary.substring(i, i + 8), 2);
+            String res = Integer.toString(decimal, 16);
+            while (res.length() < 2) {
+                res = "0" + res;
+            }
+            res += " ";
+            total += res;
+        }
+        return total;
+    }
 }
