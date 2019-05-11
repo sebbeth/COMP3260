@@ -3,6 +3,7 @@
 
 import java.util.*;
 import java.io.*;
+
 // import java.math.BigInteger;
 
 enum cryptMode {
@@ -17,11 +18,18 @@ public class Application {
 
     private static String rawText;
     private static String rawKey;
+    private static long startTime;
+    private static long endTime;
+
 
     public Application() {
     }
 
     public static void main(String[] args) {
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(new Date());
+        startTime = calendar.getTimeInMillis();
 
         if (args.length > 0) {
             try {
@@ -45,21 +53,38 @@ public class Application {
             }
 
             if (modeOfOperation == cryptMode.ENCRYPT) {
-                processEncryption();
+                String[][] results = new String[5][];
+                results[0] = processEncryption(new AES0());
+                results[1] = processEncryption(new AES1());
+                results[2] = processEncryption(new AES2());
+                results[3] = processEncryption(new AES3());
+                results[4] = processEncryption(new AES4());
+
+                outputEncryptionResults(results);
+
                 // testEnDec();
             } else if (modeOfOperation == cryptMode.DECRYPT) {
                 processDecryption();
             }
 
         } else {
-            // System.out.println("No file provided. Ending program.\n");
             try {
+                System.out.println("No file provided. Using input.txt\n");
                 modeOfOperation = cryptMode.ENCRYPT;
                 loadData("input.txt");
+                String[][] results = new String[5][];
+
+                results[0] = processEncryption(new AES0());
+                results[1] = processEncryption(new AES1());
+                results[2] = processEncryption(new AES2());
+                results[3] = processEncryption(new AES3());
+                results[4] = processEncryption(new AES4());
+
+                outputEncryptionResults(results);
             } catch (Exception e) {
                 System.out.println(e);
             }
-            processEncryption();
+          
         }
     }
 
@@ -123,10 +148,11 @@ public class Application {
     // System.out.println("Decrypted Text: " + binaryToHex(decryptedResults[9]));
     // }
 
-    public static String[] processEncryption() {
-        AES vanillaAES = new AES0();
-        String[] results = vanillaAES.encrypt(rawText, rawKey);
-        outputEncryptionResults(results);
+    public static String[] processEncryption(AES aes) {
+        startTime = getTime();
+        String[] results = aes.encrypt(rawText, rawKey);
+        endTime = getTime();
+       // outputEncryptionResults(results);
         return results;
     }
 
@@ -137,13 +163,78 @@ public class Application {
         return results;
     }
 
-    private static void outputEncryptionResults(String[] results) {
-        System.out.println("Printing results of encryption");
+    /**
+     * Implimentation of avalancheAnalysis that calculates the bit difference between the plaintext and the 
+     * intermediate results in each round.
+     * 
+     * @param plaintext
+     * @param results
+     * @return an array of strings representing the bit-difference between each round's result and the plaintext
+     */
+    private static String[] avalancheAnalysis(String plaintext, String[] results) {
+        String[] output = new String[results.length];
+        char[] plaintextChars = plaintext.toCharArray();
         for (int i = 0; i < results.length; i++) {
-            System.out.println(binaryToHex(results[i]));
+            int difference = 0;
+            char[] result = results[i].toCharArray();
+            for (int j = 0; j < result.length; j++) {
+                if (result[j] != plaintextChars[j]) {
+                    difference++; 
+                }
+            }
+            output[i] = Integer.toString(difference);
         }
-        String output = Arrays.toString(results).replace("[", "").replace("]", "");
-        System.out.println(Arrays.toString(results));
+        return output;
+    }
+
+    /*
+    outputEncryptionResults
+
+    Prints the results of encryption in the console and to a text file named output.txt
+    
+    */
+    private static void outputEncryptionResults(String[][] results) {
+        String output = "ENCRYPTION\n";
+        output += "Plaintext P: " + rawText + "\n";
+        output += "Key K: " + rawKey + "\n";
+        output += "Ciphertext C: " + "\n";
+        output += results[0][results[0].length-1] + "\n";
+        output += "Running time: " + (endTime - startTime) + " milliseconds.\n";
+        output += "Avalanche:\nP and Pi under K\n";
+
+        String[] tableHeader = { "Round", "AES0", "AES1", "AES2", "AES3", "AES4" };
+
+        String[][] analysis = new String[5][];
+        analysis[0] = avalancheAnalysis(rawText, results[0]);
+        analysis[1] = avalancheAnalysis(rawText, results[1]);
+        analysis[2] = avalancheAnalysis(rawText, results[2]);
+        analysis[3] = avalancheAnalysis(rawText, results[3]);
+        analysis[4] = avalancheAnalysis(rawText, results[4]);
+
+        String[][] tableBody = new String[results[0].length ][analysis.length + 1];
+
+        for (int i = 0; i < tableBody.length; i++) {
+            for (int j = 0; j < tableBody[i].length; j++) {
+                if (j == 0) {
+                    tableBody[i][j] = Integer.toString(i);
+                } else {
+                    tableBody[i][j] = analysis[j - 1][i];
+                }
+            }
+        }
+
+        output += printTable(tableHeader,tableBody);
+         
+        output += "P under K and Ki\n";
+        // TODO add P under K and Ki table
+        System.out.print(output);
+        System.out.println("Debugging stuff, remove this:");
+        for (int i = 0; i < results[0].length; i++) {
+            System.out.println(binaryToHex(results[0][i]));
+        }
+        System.out.println(Arrays.toString(results[0]));
+
+        // Now, save output to file
         try {
             PrintWriter writer = new PrintWriter("output.txt", "UTF-8");
             writer.println(output);
@@ -154,8 +245,20 @@ public class Application {
     }
 
     private static void outputDecryptionResults(String[] results) {
-        System.out.println("DECRYPTION");
-        System.out.println(results[9]);
+        String output = "DECRYPTION\n";
+        output += "Ciphertext C: " + rawText + "\n";
+        output += "Key K: " + rawKey + "\n";
+        output += "Plaintext P: " + results[results.length-1] + "\n";
+        System.out.println(output);
+
+        // Now, save output to file
+        try {
+            PrintWriter writer = new PrintWriter("output.txt", "UTF-8");
+            writer.println(output);
+            writer.close();
+        } catch (FileNotFoundException | UnsupportedEncodingException e) {
+            System.out.println("Cannot print output");
+        }
     }
 
     private static String hexToBinary(String hex) {
@@ -182,5 +285,40 @@ public class Application {
             total += res;
         }
         return total;
+    }
+
+    /*
+    A helper function that prints to console a table based on a header array and a body matrix.
+    */
+    private static String printTable(String[] header,String[][] body) {
+        String output = "";
+        String columnPadding = "  ";
+        // Print the header
+        for (int i = 0; i < header.length; i++) { 
+            output += header[i] + columnPadding;
+        }
+        output += "\n";
+        for (int i = 0; i < body.length; i++) {  
+            // Pad each cell so that it is the same width as it's header
+            for (int j = 0; j < body[i].length; j++) {
+                int cellPadding = header[j].length() - body[i][j].length();
+                String padding = "";
+                // Pad the cell
+                if (cellPadding > 0) {
+                    for (int p = 0; p < cellPadding; p++) {
+                        padding += " ";
+                    }
+                }
+               output += body[i][j] + padding + columnPadding;
+            }
+            output += "\n";
+        }
+        return output;
+    }
+
+    private static long getTime() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(new Date());
+        return calendar.getTimeInMillis();
     }
 }
