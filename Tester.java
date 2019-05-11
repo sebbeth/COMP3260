@@ -28,10 +28,10 @@ public class Tester {
             // Encrypt the plaintext
             // modeOfOperation = cryptMode.ENCRYPT;
             Application.testLoadData(plaintext,key);
-            String[] encryptionResults = Application.processEncryption();
+            String[] encryptionResults = Application.processEncryption(new AES0());
             System.out.println(Arrays.toString(encryptionResults));
 
-            String cipherText = encryptionResults[0];
+            String cipherText = encryptionResults[encryptionResults.length-1];
             // Now decrypt the plaintext
             // modeOfOperation = cryptMode.DECRYPT;
             Application.testLoadData(cipherText,key);
@@ -39,13 +39,13 @@ public class Tester {
             System.out.println(Arrays.toString(decryptionResults));
 
             System.out.println("\n \n \n \n ======================= TEST RESULTS ======================= \n");
-            if (encryptionResults[0] == decryptionResults[0]) {
+            if (cipherText == decryptionResults[decryptionResults.length-1]) {
                 System.out.println("PASS");
                 return true;
             } else {
                 System.out.println("FAIL");
                 System.err.println("Plaintext: " + plaintext  + " \nKey:  " + key);
-                System.err.println( encryptionResults[0] + " != " + decryptionResults[0] );
+                System.err.println( cipherText + " != " + decryptionResults[decryptionResults.length-1] );
                 return false;
             }
 
