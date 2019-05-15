@@ -19,8 +19,6 @@ public class Application {
 
     private static String rawText;
     private static String rawKey;
-    private static String texti;
-    private static String keyi;
     private static long startTime;
     private static long endTime;
 
@@ -30,9 +28,7 @@ public class Application {
 
     public static void main(String[] args) {
 
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(new Date());
-        startTime = calendar.getTimeInMillis();
+        startTime = getTime();
 
         if (args.length > 0) {
             try {
@@ -56,14 +52,8 @@ public class Application {
             }
 
             if (modeOfOperation == cryptMode.ENCRYPT) {
-                String[][] results = new String[5][];
-                results[0] = processEncryption(new AES0(),rawText,rawKey);
-                results[1] = processEncryption(new AES1(),rawText,rawKey);
-                results[2] = processEncryption(new AES2(),rawText,rawKey);
-                results[3] = processEncryption(new AES3(),rawText,rawKey);
-                results[4] = processEncryption(new AES4(),rawText,rawKey);
-
-                outputEncryptionResults(results);
+               
+                generateAnalysis();
 
                 // testEnDec();
             } else if (modeOfOperation == cryptMode.DECRYPT) {
@@ -75,20 +65,67 @@ public class Application {
                 System.out.println("No file provided. Using input.txt\n");
                 modeOfOperation = cryptMode.ENCRYPT;
                 loadData("input.txt");
-                String[][] results = new String[5][];
 
-                results[0] = processEncryption(new AES0(),rawText,rawKey);
-                results[1] = processEncryption(new AES1(),rawText,rawKey);
-                results[2] = processEncryption(new AES2(),rawText,rawKey);
-                results[3] = processEncryption(new AES3(),rawText,rawKey);
-                results[4] = processEncryption(new AES4(),rawText,rawKey);
-
-                outputEncryptionResults(results);
+                generateAnalysis();
+             
             } catch (Exception e) {
-                System.out.println(e);
+                e.printStackTrace();
             }
           
         }
+    }
+
+
+    public static void generateAnalysis() {
+
+        AES[] algorithms = {
+            new AES0(),
+            new AES1(),
+            new AES2(),
+            new AES3(),
+            new AES4(),
+        };
+
+       String[][] pandPiUnderK = new String[5][11];
+
+        for (int i = 0; i < algorithms.length; i++) {
+            String[] pRounds = processEncryption(algorithms[i], rawText, rawKey);
+            String[][] piRounds = new String[rawText.length()][];
+            String[] averageDiffs = new String[pRounds.length];
+            for (int k = 0; k < averageDiffs.length; k++) {
+                double numerator = 0.0;
+                for (int j = 0; j < rawText.length(); j++) {
+                    piRounds[j] = processEncryption(algorithms[i], flipOneBit(j,rawText), rawKey);
+                    numerator += bitDiff(pRounds[k],piRounds[j][k]);
+                }
+                double average = numerator / (double)rawText.length();
+                averageDiffs[k] = String.format("%.0f", average);
+            }
+            pandPiUnderK[i] = averageDiffs;
+        }
+
+        String[][] pUnderKandKi = new String[5][11];
+
+        for (int i = 0; i < algorithms.length; i++) {
+            String[] pRounds = processEncryption(algorithms[i], rawText, rawKey);
+            String[][] piRounds = new String[rawText.length()][];
+            String[] averageDiffs = new String[pRounds.length];
+            for (int k = 0; k < averageDiffs.length; k++) {
+                double numerator = 0.0;
+                for (int j = 0; j < rawText.length(); j++) {
+                    piRounds[j] = processEncryption(algorithms[i], rawText,flipOneBit(j,rawKey));
+                    numerator += bitDiff(pRounds[k],piRounds[j][k]);
+                }
+                double average = numerator / (double)rawText.length();
+                averageDiffs[k] = String.format("%.0f", average);
+            }
+            pUnderKandKi[i] = averageDiffs;
+        }
+
+        String[] aes0Result = processEncryption(new AES0(), rawText, rawKey);
+        String ciphertext = aes0Result[aes0Result.length-1];
+
+        outputEncryptionResults(pandPiUnderK,pUnderKandKi,ciphertext);
     }
 
     public static void testLoadData(String textLine, String keyLine) throws Exception {
@@ -114,12 +151,7 @@ public class Application {
             String keyLine = dataFile.nextLine();
 
             rawText = textLine;
-            rawKey = keyLine;
-            // set texti and keyi
-            texti = flipOneBit(rawText);
-            keyi = flipOneBit(rawKey);
-            System.out.println("TEXTi " + texti);
-            System.out.println("KEYi " + keyi);
+            rawKey = keyLine;         
 
             // TODO remove, only needed while testing with hex input
            // rawText = hexToBinary(textLine);
@@ -157,10 +189,13 @@ public class Application {
     // }
 
     public static String[] processEncryption(AES aes, String plaintext, String key) {
-        startTime = getTime();
-        String[] results = aes.encrypt(plaintext, key);
+        String[] aesResults = aes.encrypt(plaintext, key);
+        String[] results = new String[aesResults.length+1];
+        results[0] = plaintext;
+        for (int i = 0; i < aesResults.length; i++) {
+            results[i+1] = aesResults[i];
+        }
         endTime = getTime();
-       // outputEncryptionResults(results);
         return results;
     }
 
@@ -171,62 +206,75 @@ public class Application {
     }
 
     /**
-     * Implimentation of avalancheAnalysis that calculates the bit difference between the plaintext and the 
-     * intermediate results in each round.
+     * Implimentation of avalancheAnalysis 
      * 
      * @param plaintext
      * @param results
-     * @return an array of strings representing the bit-difference between each round's result and the plaintext
+     * @return an array of strings representing the bit-difference 
      */
-    private static String[] avalancheAnalysis(String plaintext, String[] results) {
-        String[] output = new String[results.length];
-        char[] plaintextChars = plaintext.toCharArray();
-        for (int i = 0; i < results.length; i++) {
+    private static String[] avalancheAnalysis(String[] resultsA, String[] resultsB) {
+        String[] output = new String[resultsA.length];
+        for (int i = 0; i < resultsA.length; i++) {
             int difference = 0;
-            char[] result = results[i].toCharArray();
-            for (int j = 0; j < result.length; j++) {
-                if (result[j] != plaintextChars[j]) {
+            char[] resultA = resultsA[i].toCharArray();
+            char[] resultB = resultsB[i].toCharArray();
+            for (int j = 0; j < resultA.length; j++) {
+                if (resultA[j] != resultB[j]) {
                     difference++; 
-                }
+                }    
             }
             output[i] = Integer.toString(difference);
         }
         return output;
     }
 
+    private static double bitDiff(String a, String b ) {
+        char[] aChars = a.toCharArray();
+        char[] bChars = b.toCharArray();
+        double difference = 0;
+        for (int i = 0; i < aChars.length; i++) {
+            if (aChars[i] != bChars[i]) {
+                difference++; 
+            }
+        }
+        return difference;
+    }
     /*
     outputEncryptionResults
 
     Prints the results of encryption in the console and to a text file named output.txt
     
     */
-    private static void outputEncryptionResults(String[][] results) {
+    private static void outputEncryptionResults(String[][] resultsText,String[][] resultsKey, String ciphertext) {
         String output = "ENCRYPTION\n";
         output += "Plaintext P: " + rawText + "\n";
         output += "Key K: " + rawKey + "\n";
-        output += "Ciphertext C: " + results[0][results[0].length-1] + "\n";
-        output += "Ciphertext AES1 C: " + "\n";
-        output += results[1][results[1].length-1] + "\n";
+        output += "Ciphertext C: " + ciphertext + "\n";
         output += "Running time: " + (endTime - startTime) + " milliseconds.\n";
         output += "Avalanche:\nP and Pi under K\n";
 
         String[] tableHeader = { "Round", "AES0", "AES1", "AES2", "AES3", "AES4" };
 
-        String[][] analysis = new String[5][];
-        analysis[0] = avalancheAnalysis(rawText, results[0]);
-        analysis[1] = avalancheAnalysis(rawText, results[1]);
-        analysis[2] = avalancheAnalysis(rawText, results[2]);
-        analysis[3] = avalancheAnalysis(rawText, results[3]);
-        analysis[4] = avalancheAnalysis(rawText, results[4]);
-
-        String[][] tableBody = new String[results[0].length ][analysis.length + 1];
+        String[][] tableBody = new String[resultsText[0].length ][resultsText.length + 1];
 
         for (int i = 0; i < tableBody.length; i++) {
             for (int j = 0; j < tableBody[i].length; j++) {
                 if (j == 0) {
                     tableBody[i][j] = Integer.toString(i);
                 } else {
-                    tableBody[i][j] = analysis[j - 1][i];
+                    tableBody[i][j] = resultsText[j - 1][i];
+                }
+            }
+        }
+
+        String[][] table2Body = new String[resultsKey[0].length ][resultsKey.length + 1];
+
+        for (int i = 0; i < table2Body.length; i++) {
+            for (int j = 0; j < table2Body[i].length; j++) {
+                if (j == 0) {
+                    table2Body[i][j] = Integer.toString(i);
+                } else {
+                    table2Body[i][j] = resultsKey[j - 1][i];
                 }
             }
         }
@@ -234,14 +282,9 @@ public class Application {
         output += printTable(tableHeader,tableBody);
          
         output += "P under K and Ki\n";
-        // TODO add P under K and Ki table
+        output += printTable(tableHeader,table2Body);
         System.out.print(output);
-        System.out.println("Debugging stuff, remove this:");
-        for (int i = 0; i < results[0].length; i++) {
-            System.out.println(binaryToHex(results[0][i]));
-        }
-        System.out.println(Arrays.toString(results[0]));
-
+    
         // Now, save output to file
         try {
             PrintWriter writer = new PrintWriter("output.txt", "UTF-8");
@@ -252,11 +295,11 @@ public class Application {
         }
     }
 
-    private static void outputDecryptionResults(String[] results) {
+    private static void outputDecryptionResults(String[] resultsText) {
         String output = "DECRYPTION\n";
         output += "Ciphertext C: " + rawText + "\n";
         output += "Key K: " + rawKey + "\n";
-        output += "Plaintext P: " + results[results.length-1] + "\n";
+        output += "Plaintext P: " + resultsText[resultsText.length-1] + "\n";
         System.out.println(output);
 
         // Now, save output to file
@@ -324,14 +367,12 @@ public class Application {
         return output;
     }
 
-    private static String flipOneBit(String input) {
-        Random r = new Random();
-        int x = r.nextInt(input.length());
+    private static String flipOneBit(int i,String input) {
        char[] charArray = input.toCharArray();
-        if (charArray[x] == '0') {
-            charArray[x] = '1';
+        if (charArray[i] == '0') {
+            charArray[i] = '1';
         } else {
-            charArray[x] = '0';
+            charArray[i] = '0';
         }
         return new String(charArray);
     }
