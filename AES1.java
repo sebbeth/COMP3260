@@ -1,3 +1,8 @@
+/**
+ * Author: David Low and Sebastian Brown
+ * Modified: 15 May 2019
+ * Purpose: Extends the AES abstract class to provide a modified implementation of the AES algorithm without substituting bytes.
+ */
 public class AES1 extends AES {
 
     /**
@@ -19,7 +24,7 @@ public class AES1 extends AES {
         // Initial Key XOR
         byte[] result = addRoundKey(plaintext, subKeys[0]);
 
-        // 9 rounds
+        // loop through the number of rounds -1
         for (int i = 1; i <= NUM_OF_ROUNDS - 1; i++) {
             // result = substituteBytes(result, S_BOX);
             result = shiftRows(result, Direction.LEFT);
@@ -54,7 +59,7 @@ public class AES1 extends AES {
         // Initial Key XOR
         byte[] result = addRoundKey(ciphertext, subKeys[NUM_OF_ROUNDS]);
 
-        // 9 rounds
+        // loop through the number of rounds -1
         for (int i = NUM_OF_ROUNDS - 1; i >= 1; i--) {
             result = shiftRows(result, Direction.RIGHT);
             // result = substituteBytes(result, INV_S_BOX);

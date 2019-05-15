@@ -1,3 +1,4 @@
+
 /**
  * Author: David Low and Sebastian Brown
  * Modified: 15 May 2019
@@ -18,12 +19,13 @@ public class Application {
     private static byte[] text = new byte[16];
     private static byte[] key = new byte[16];
 
-
     private static String rawText;
     private static String rawKey;
     private static long startTime;
     private static long endTime;
 
+    private static String inputFileName;
+    private static String outputFileName;
 
     public Application() {
     }
@@ -34,45 +36,56 @@ public class Application {
 
         if (args.length > 0) {
             try {
+
+                if (args.length != 3) {
+                    throw new IllegalArgumentException("Please use three arguments: *modeOfEncryptionFlag* *inputFileName* *outputFileName*");
+                }
                 switch (args[0]) {
                 case "-e":
                 case "-E":
+                case "--encrypt":
                     modeOfOperation = cryptMode.ENCRYPT;
                     break;
                 case "-d":
                 case "-D":
+                case "--decrypt":
                     modeOfOperation = cryptMode.DECRYPT;
                     break;
                 default:
                     throw new IllegalArgumentException(
                             "No valid mode of operation was used. Please enter '-e' for encryption or '-d' for decryption.");
                 }
+                System.out.println("Using data from '" + args[1] + "' and outputting to '" + args[2] + "'.\n");
+                inputFileName = args[1];
+                outputFileName = args[2];
 
-                loadData(args[1]);
+                loadData();
             } catch (Exception e) {
                 System.out.println("Error: " + e);
             }
 
             if (modeOfOperation == cryptMode.ENCRYPT) {
-               
+
                 generateAnalysis();
 
             } else if (modeOfOperation == cryptMode.DECRYPT) {
-                processDecryption(new AES0(),rawText,rawKey);
+                processDecryption(new AES0(), rawText, rawKey);
             }
 
         } else {
             try {
-                System.out.println("No file provided. Using input.txt\n");
+                System.out.println("No file provided. Using data from 'input.txt' and outputting to 'output.txt'\n");
                 modeOfOperation = cryptMode.ENCRYPT;
-                loadData("input.txt");
+                inputFileName = "input.txt";
+                outputFileName = "output.txt";
+                loadData();
 
                 generateAnalysis();
-             
+
             } catch (Exception e) {
                 e.printStackTrace();
             }
-          
+
         }
     }
 
@@ -81,15 +94,9 @@ public class Application {
      */
     public static void generateAnalysis() {
 
-        AES[] algorithms = {
-            new AES0(),
-            new AES1(),
-            new AES2(),
-            new AES3(),
-            new AES4(),
-        };
+        AES[] algorithms = { new AES0(), new AES1(), new AES2(), new AES3(), new AES4(), };
 
-       String[][] pandPiUnderK = new String[5][11];
+        String[][] pandPiUnderK = new String[5][11];
 
         for (int i = 0; i < algorithms.length; i++) {
             String[] pRounds = processEncryption(algorithms[i], rawText, rawKey);
@@ -98,10 +105,10 @@ public class Application {
             for (int k = 0; k < averageDiffs.length; k++) {
                 double numerator = 0.0;
                 for (int j = 0; j < rawText.length(); j++) {
-                    piRounds[j] = processEncryption(algorithms[i], flipOneBit(j,rawText), rawKey);
-                    numerator += bitDiff(pRounds[k],piRounds[j][k]);
+                    piRounds[j] = processEncryption(algorithms[i], flipOneBit(j, rawText), rawKey);
+                    numerator += bitDiff(pRounds[k], piRounds[j][k]);
                 }
-                double average = numerator / (double)rawText.length();
+                double average = numerator / (double) rawText.length();
                 averageDiffs[k] = String.format("%.0f", average);
             }
             pandPiUnderK[i] = averageDiffs;
@@ -116,19 +123,19 @@ public class Application {
             for (int k = 0; k < averageDiffs.length; k++) {
                 double numerator = 0.0;
                 for (int j = 0; j < rawText.length(); j++) {
-                    piRounds[j] = processEncryption(algorithms[i], rawText,flipOneBit(j,rawKey));
-                    numerator += bitDiff(pRounds[k],piRounds[j][k]);
+                    piRounds[j] = processEncryption(algorithms[i], rawText, flipOneBit(j, rawKey));
+                    numerator += bitDiff(pRounds[k], piRounds[j][k]);
                 }
-                double average = numerator / (double)rawText.length();
+                double average = numerator / (double) rawText.length();
                 averageDiffs[k] = String.format("%.0f", average);
             }
             pUnderKandKi[i] = averageDiffs;
         }
 
         String[] aes0Result = processEncryption(new AES0(), rawText, rawKey);
-        String ciphertext = aes0Result[aes0Result.length-1];
+        String ciphertext = aes0Result[aes0Result.length - 1];
 
-        outputEncryptionResults(pandPiUnderK,pUnderKandKi,ciphertext);
+        outputEncryptionResults(pandPiUnderK, pUnderKandKi, ciphertext);
     }
 
     public static void testLoadData(String textLine, String keyLine) throws Exception {
@@ -140,21 +147,19 @@ public class Application {
             text[i] = (byte) Integer.parseInt(textLine.substring(i * 8, i * 8 + 8), 2);
             key[i] = (byte) Integer.parseInt(keyLine.substring(i * 8, i * 8 + 8), 2);
         }
-       
-        
 
     }
 
-    public static void loadData(String fileName) throws Exception {
+    public static void loadData() throws Exception {
         Scanner dataFile = null;
 
         try {
-            dataFile = new Scanner(new File(fileName));
+            dataFile = new Scanner(new File(inputFileName));
             String textLine = dataFile.nextLine();
             String keyLine = dataFile.nextLine();
 
             rawText = textLine;
-            rawKey = keyLine;         
+            rawKey = keyLine;
 
         } catch (Exception e) {
             throw new Exception(e);
@@ -167,10 +172,10 @@ public class Application {
 
     public static String[] processEncryption(AES aes, String plaintext, String key) {
         String[] aesResults = aes.encrypt(plaintext, key);
-        String[] results = new String[aesResults.length+1];
+        String[] results = new String[aesResults.length + 1];
         results[0] = plaintext;
         for (int i = 0; i < aesResults.length; i++) {
-            results[i+1] = aesResults[i];
+            results[i + 1] = aesResults[i];
         }
         endTime = getTime();
         return results;
@@ -182,26 +187,26 @@ public class Application {
         return results;
     }
 
-   
-
-    private static double bitDiff(String a, String b ) {
+    private static double bitDiff(String a, String b) {
         char[] aChars = a.toCharArray();
         char[] bChars = b.toCharArray();
         double difference = 0;
         for (int i = 0; i < aChars.length; i++) {
             if (aChars[i] != bChars[i]) {
-                difference++; 
+                difference++;
             }
         }
         return difference;
     }
-    /*
-    outputEncryptionResults
 
-    Prints the results of encryption in the console and to a text file named output.txt
-    
-    */
-    private static void outputEncryptionResults(String[][] resultsText,String[][] resultsKey, String ciphertext) {
+    /*
+     * outputEncryptionResults
+     * 
+     * Prints the results of encryption in the console and to a text file named
+     * output.txt
+     * 
+     */
+    private static void outputEncryptionResults(String[][] resultsText, String[][] resultsKey, String ciphertext) {
         String output = "ENCRYPTION\n";
         output += "Plaintext P: " + rawText + "\n";
         output += "Key K: " + rawKey + "\n";
@@ -211,7 +216,7 @@ public class Application {
 
         String[] tableHeader = { "Round", "AES0", "AES1", "AES2", "AES3", "AES4" };
 
-        String[][] tableBody = new String[resultsText[0].length ][resultsText.length + 1];
+        String[][] tableBody = new String[resultsText[0].length][resultsText.length + 1];
 
         for (int i = 0; i < tableBody.length; i++) {
             for (int j = 0; j < tableBody[i].length; j++) {
@@ -223,7 +228,7 @@ public class Application {
             }
         }
 
-        String[][] table2Body = new String[resultsKey[0].length ][resultsKey.length + 1];
+        String[][] table2Body = new String[resultsKey[0].length][resultsKey.length + 1];
 
         for (int i = 0; i < table2Body.length; i++) {
             for (int j = 0; j < table2Body[i].length; j++) {
@@ -235,15 +240,15 @@ public class Application {
             }
         }
 
-        output += printTable(tableHeader,tableBody);
-         
-        output += "P under K and Ki\n";
-        output += printTable(tableHeader,table2Body);
+        output += printTable(tableHeader, tableBody);
+
+        output += "\nP under K and Ki\n";
+        output += printTable(tableHeader, table2Body);
         System.out.print(output);
-    
+
         // Now, save output to file
         try {
-            PrintWriter writer = new PrintWriter("output.txt", "UTF-8");
+            PrintWriter writer = new PrintWriter(outputFileName, "UTF-8");
             writer.println(output);
             writer.close();
         } catch (FileNotFoundException | UnsupportedEncodingException e) {
@@ -255,7 +260,7 @@ public class Application {
         String output = "DECRYPTION\n";
         output += "Ciphertext C: " + rawText + "\n";
         output += "Key K: " + rawKey + "\n";
-        output += "Plaintext P: " + resultsText[resultsText.length-1] + "\n";
+        output += "Plaintext P: " + resultsText[resultsText.length - 1] + "\n";
         System.out.println(output);
 
         // Now, save output to file
@@ -268,19 +273,19 @@ public class Application {
         }
     }
 
-   
     /*
-    A helper function that prints to console a table based on a header array and a body matrix.
-    */
-    private static String printTable(String[] header,String[][] body) {
+     * A helper function that prints to console a table based on a header array and
+     * a body matrix.
+     */
+    private static String printTable(String[] header, String[][] body) {
         String output = "";
         String columnPadding = "  ";
         // Print the header
-        for (int i = 0; i < header.length; i++) { 
+        for (int i = 0; i < header.length; i++) {
             output += header[i] + columnPadding;
         }
         output += "\n";
-        for (int i = 0; i < body.length; i++) {  
+        for (int i = 0; i < body.length; i++) {
             // Pad each cell so that it is the same width as it's header
             for (int j = 0; j < body[i].length; j++) {
                 int cellPadding = header[j].length() - body[i][j].length();
@@ -291,7 +296,7 @@ public class Application {
                         padding += " ";
                     }
                 }
-               output += body[i][j] + padding + columnPadding;
+                output += body[i][j] + padding + columnPadding;
             }
             output += "\n";
         }
@@ -299,10 +304,11 @@ public class Application {
     }
 
     /**
-     * flipOneBit is a helper function that takes a bitstring and swaps one bit at index i
+     * flipOneBit is a helper function that takes a bitstring and swaps one bit at
+     * index i
      */
-    private static String flipOneBit(int i,String input) {
-       char[] charArray = input.toCharArray();
+    private static String flipOneBit(int i, String input) {
+        char[] charArray = input.toCharArray();
         if (charArray[i] == '0') {
             charArray[i] = '1';
         } else {
@@ -312,7 +318,8 @@ public class Application {
     }
 
     /**
-     * A helper function used to calculate the current system time and return it as a long
+     * A helper function used to calculate the current system time and return it as
+     * a long
      */
     private static long getTime() {
         Calendar calendar = Calendar.getInstance();
