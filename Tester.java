@@ -6,6 +6,7 @@
 import java.util.*;
 // import java.io.*;
 
+
 public class Tester {
 
     // private static cryptMode modeOfOperation;
@@ -23,7 +24,7 @@ public class Tester {
         };
         
        // AES[] algorithms = { new AES1() };
-        int repeats = 1; // The number of times to repeat the tests (with random input)
+        int repeats = 100; // The number of times to repeat the tests (with random input)
         String results = "";
         for (int i=0; i < repeats; i++ ) {
             for (AES algorithm : algorithms) {
@@ -41,21 +42,22 @@ public class Tester {
     public static String runTest(int keyLength, int plaintextLength, AES algorithm) {
       
         try {
-            String plaintext = generateBitString(plaintextLength);
+           String plaintext = generateBitString(plaintextLength);
             String key = generateBitString(keyLength);
-          /*  String plaintext = "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
-            String key = "11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111";*/
+            //String plaintext = "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
+            //String key = "11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111";
+            
             // Encrypt the plaintext
             // modeOfOperation = cryptMode.ENCRYPT;
             Application.testLoadData(plaintext,key);
-            String[] encryptionResults = Application.processEncryption(algorithm);
+            String[] encryptionResults = Application.processEncryption(algorithm,plaintext,key);
             System.out.println(Arrays.toString(encryptionResults));
 
             String cipherText = encryptionResults[encryptionResults.length-1];
             // Now decrypt the plaintext
             // modeOfOperation = cryptMode.DECRYPT;
             Application.testLoadData(cipherText,key);
-            String[] decryptionResults = Application.processDecryption(algorithm);
+            String[] decryptionResults = Application.processDecryption(algorithm,cipherText,key);
             System.out.println(Arrays.toString(decryptionResults));
 
            

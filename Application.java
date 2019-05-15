@@ -16,8 +16,11 @@ public class Application {
     private static byte[] text = new byte[16];
     private static byte[] key = new byte[16];
 
+
     private static String rawText;
     private static String rawKey;
+    private static String texti;
+    private static String keyi;
     private static long startTime;
     private static long endTime;
 
@@ -54,17 +57,17 @@ public class Application {
 
             if (modeOfOperation == cryptMode.ENCRYPT) {
                 String[][] results = new String[5][];
-                results[0] = processEncryption(new AES0());
-                results[1] = processEncryption(new AES1());
-                results[2] = processEncryption(new AES2());
-                results[3] = processEncryption(new AES3());
-                results[4] = processEncryption(new AES4());
+                results[0] = processEncryption(new AES0(),rawText,rawKey);
+                results[1] = processEncryption(new AES1(),rawText,rawKey);
+                results[2] = processEncryption(new AES2(),rawText,rawKey);
+                results[3] = processEncryption(new AES3(),rawText,rawKey);
+                results[4] = processEncryption(new AES4(),rawText,rawKey);
 
                 outputEncryptionResults(results);
 
                 // testEnDec();
             } else if (modeOfOperation == cryptMode.DECRYPT) {
-                processDecryption(new AES0());
+                processDecryption(new AES0(),rawText,rawKey);
             }
 
         } else {
@@ -74,11 +77,11 @@ public class Application {
                 loadData("input.txt");
                 String[][] results = new String[5][];
 
-                results[0] = processEncryption(new AES0());
-                results[1] = processEncryption(new AES1());
-                results[2] = processEncryption(new AES2());
-                results[3] = processEncryption(new AES3());
-                results[4] = processEncryption(new AES4());
+                results[0] = processEncryption(new AES0(),rawText,rawKey);
+                results[1] = processEncryption(new AES1(),rawText,rawKey);
+                results[2] = processEncryption(new AES2(),rawText,rawKey);
+                results[3] = processEncryption(new AES3(),rawText,rawKey);
+                results[4] = processEncryption(new AES4(),rawText,rawKey);
 
                 outputEncryptionResults(results);
             } catch (Exception e) {
@@ -94,10 +97,12 @@ public class Application {
         rawKey = keyLine;
 
         for (int i = 0; i < 16; i++) {
-            // System.out.println(i + " " + textLine.substring(i, i+8));
             text[i] = (byte) Integer.parseInt(textLine.substring(i * 8, i * 8 + 8), 2);
             key[i] = (byte) Integer.parseInt(keyLine.substring(i * 8, i * 8 + 8), 2);
         }
+       
+        
+
     }
 
     public static void loadData(String fileName) throws Exception {
@@ -110,6 +115,11 @@ public class Application {
 
             rawText = textLine;
             rawKey = keyLine;
+            // set texti and keyi
+            texti = flipOneBit(rawText);
+            keyi = flipOneBit(rawKey);
+            System.out.println("TEXTi " + texti);
+            System.out.println("KEYi " + keyi);
 
             // TODO remove, only needed while testing with hex input
            // rawText = hexToBinary(textLine);
@@ -146,16 +156,16 @@ public class Application {
     // System.out.println("Decrypted Text: " + binaryToHex(decryptedResults[9]));
     // }
 
-    public static String[] processEncryption(AES aes) {
+    public static String[] processEncryption(AES aes, String plaintext, String key) {
         startTime = getTime();
-        String[] results = aes.encrypt(rawText, rawKey);
+        String[] results = aes.encrypt(plaintext, key);
         endTime = getTime();
        // outputEncryptionResults(results);
         return results;
     }
 
-    public static String[] processDecryption(AES aes) {
-        String[] results = aes.decrypt(rawText, rawKey);
+    public static String[] processDecryption(AES aes, String plaintext, String key) {
+        String[] results = aes.decrypt(plaintext, key);
         outputDecryptionResults(results);
         return results;
     }
@@ -194,9 +204,8 @@ public class Application {
         String output = "ENCRYPTION\n";
         output += "Plaintext P: " + rawText + "\n";
         output += "Key K: " + rawKey + "\n";
-        output += "Ciphertext C: " + "\n";
-        output += results[0][results[0].length-1] + "\n";
-          output += "Ciphertext AES1 C: " + "\n";
+        output += "Ciphertext C: " + results[0][results[0].length-1] + "\n";
+        output += "Ciphertext AES1 C: " + "\n";
         output += results[1][results[1].length-1] + "\n";
         output += "Running time: " + (endTime - startTime) + " milliseconds.\n";
         output += "Avalanche:\nP and Pi under K\n";
@@ -313,6 +322,18 @@ public class Application {
             output += "\n";
         }
         return output;
+    }
+
+    private static String flipOneBit(String input) {
+        Random r = new Random();
+        int x = r.nextInt(input.length());
+       char[] charArray = input.toCharArray();
+        if (charArray[x] == '0') {
+            charArray[x] = '1';
+        } else {
+            charArray[x] = '0';
+        }
+        return new String(charArray);
     }
 
     private static long getTime() {

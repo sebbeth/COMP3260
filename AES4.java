@@ -48,8 +48,8 @@ public class AES4 extends AES {
         byte[][] results = new byte[16][NUM_OF_ROUNDS];
 
         // Initial Key XOR
-        byte[] result = addRoundKey(ciphertext, subKeys[NUM_OF_ROUNDS]);
-
+        //byte[] result = addRoundKey(ciphertext, subKeys[NUM_OF_ROUNDS]);
+        byte[] result = ciphertext;
         // 9 rounds
         for (int i = NUM_OF_ROUNDS - 1; i >= 1; i--) {
             result = shiftRows(result, Direction.RIGHT);
@@ -62,7 +62,7 @@ public class AES4 extends AES {
         // Final round
         result = shiftRows(result, Direction.RIGHT);
         result = substituteBytes(result, INV_S_BOX);
-     //   result = addRoundKey(result, subKeys[0]);
+        result = addRoundKey(result, subKeys[0]);
         results[9] = result;
 
         return results;
