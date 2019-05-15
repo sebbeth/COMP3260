@@ -225,13 +225,10 @@ public abstract class AES {
      * Substitutes sixteen bytes in a byte array through a substitution box.
      */
     protected byte[] substituteBytes(byte[] text, int[] subBox) {
-        // System.out.println("Text Before Substituting: " + stringifyByteArray(text));
         byte[] substitutedText = new byte[16];
         for (int i = 0; i < 16; i++) {
             substitutedText[i] = (byte) subBox[text[i] & 0xFF];
         }
-        // System.out.println("Text After Substituting: " +
-        // stringifyByteArray(substitutedText));
         return substitutedText;
     }
 
@@ -239,7 +236,6 @@ public abstract class AES {
      * Shifts four rows in a 4x4 grid (stored as a 16-element 1D array)
      */
     protected byte[] shiftRows(byte[] text, Direction direction) {
-        // System.out.println("Text Before shifting: " + stringifyByteArray(text));
         byte[] result = new byte[16];
         for (int i = 0; i < 4; i++) {
             switch (direction) {
@@ -257,7 +253,6 @@ public abstract class AES {
                 break;
             }
         }
-        // System.out.println("Text After shifting: " + stringifyByteArray(result));
         return result;
     }
 
@@ -265,7 +260,6 @@ public abstract class AES {
      * Mixes columns in a 4x4 grid (stored as a 16-element 1D array)
      */
     protected byte[] mixColumns(byte[] text) {
-        // System.out.println("Text Before Mixing: " + stringifyByteArray(text));
 
         byte[] mixedText = new byte[16];
 
@@ -281,7 +275,6 @@ public abstract class AES {
 
         }
 
-        // System.out.println("Text After Mixing: " + stringifyByteArray(mixedText));
         return mixedText;
     }
 
@@ -289,8 +282,7 @@ public abstract class AES {
      * Inverts mixed columns in a 4x4 grid (stored as a 16-element 1D array)
      */
     protected byte[] invertMixedColumns(byte[] text) {
-        // System.out.println("Text Before Inverse Mixing: " +
-        // stringifyByteArray(text));
+
         byte[] invertedText = new byte[16];
 
         for (int i = 0; i < 4; i++) {
@@ -304,8 +296,6 @@ public abstract class AES {
                     ^ MUL_9[text[(4 * i) + 2] & 0xFF] ^ MUL_14[text[(4 * i) + 3] & 0xFF]);
 
         }
-        // System.out.println("Text After Inverse Mixing: " +
-        // stringifyByteArray(invertedText));
         return invertedText;
     }
 
@@ -405,19 +395,7 @@ public abstract class AES {
         String output = "";
         for (int i = 0; i < 16; i++) {
             output += String.format("%8s", Integer.toBinaryString(input[i] & 0xFF)).replace(' ', '0');
-            // hexText += String.format("%02X", byteResults[i][j]);
         }
         return output;
     }
-
-    /**
-     * Creates a hex string value of any byte array
-     */
-    // private String stringifyByteArray(byte[] input) {
-    // String output = "";
-    // for (int i = 0; i < input.length; i++) {
-    // output += String.format("%02X", input[i]).toLowerCase();
-    // }
-    // return output;
-    // }
 }

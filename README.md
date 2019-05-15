@@ -14,6 +14,26 @@ e.g.
 $ java Application -e input.txt output.txt
 $ java Application -d input.txt output.txt
 
+# Program Structure
+
+The program is comprised of the following classes:
+
+- Application
+- Tester
+- AES:
+    - AES0
+    - AES1
+    - AES2
+    - AES3
+    - AES4
+
+Application provides an entry point to the program. 
+It handles recieving input and generating output.
+
+AES is an abstract class that is extended by AES0 - AES4.
+
+Tester is a functional test class that validates encryption and decryption results (see testing)
+
 # testing
 
 A test class has been included that generates random input to be encrypted and then decrypted.
