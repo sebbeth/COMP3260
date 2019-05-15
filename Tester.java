@@ -45,14 +45,12 @@ public class Tester {
             // Encrypt the plaintext
             Application.testLoadData(plaintext,key);
             String[] encryptionResults = Application.processEncryption(algorithm,plaintext,key);
-            System.out.println(Arrays.toString(encryptionResults));
 
             String cipherText = encryptionResults[encryptionResults.length-1];
             // Now decrypt the plaintext
             // modeOfOperation = cryptMode.DECRYPT;
             Application.testLoadData(cipherText,key);
             String[] decryptionResults = Application.processDecryption(algorithm,cipherText,key);
-            System.out.println(Arrays.toString(decryptionResults));
 
            
             if (plaintext.equals(decryptionResults[decryptionResults.length-1])) {
