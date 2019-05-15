@@ -205,28 +205,7 @@ public class Application {
         return results;
     }
 
-    /**
-     * Implimentation of avalancheAnalysis 
-     * 
-     * @param plaintext
-     * @param results
-     * @return an array of strings representing the bit-difference 
-     */
-    private static String[] avalancheAnalysis(String[] resultsA, String[] resultsB) {
-        String[] output = new String[resultsA.length];
-        for (int i = 0; i < resultsA.length; i++) {
-            int difference = 0;
-            char[] resultA = resultsA[i].toCharArray();
-            char[] resultB = resultsB[i].toCharArray();
-            for (int j = 0; j < resultA.length; j++) {
-                if (resultA[j] != resultB[j]) {
-                    difference++; 
-                }    
-            }
-            output[i] = Integer.toString(difference);
-        }
-        return output;
-    }
+   
 
     private static double bitDiff(String a, String b ) {
         char[] aChars = a.toCharArray();
@@ -312,32 +291,7 @@ public class Application {
         }
     }
 
-    private static String hexToBinary(String hex) {
-        String total = "";
-        for (int i = 0; i < hex.length(); i += 2) {
-            String res = Integer.toBinaryString(Integer.parseInt(hex.substring(i, i + 2), 16));
-            while (res.length() < 8) {
-                res = "0" + res;
-            }
-            total += res;
-        }
-        return total;
-    }
-
-    private static String binaryToHex(String binary) {
-        String total = "";
-        for (int i = 0; i < binary.length(); i += 8) {
-            int decimal = Integer.parseInt(binary.substring(i, i + 8), 2);
-            String res = Integer.toString(decimal, 16);
-            while (res.length() < 2) {
-                res = "0" + res;
-            }
-            res += " ";
-            total += res;
-        }
-        return total;
-    }
-
+   
     /*
     A helper function that prints to console a table based on a header array and a body matrix.
     */
