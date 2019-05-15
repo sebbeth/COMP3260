@@ -1,15 +1,14 @@
 /**
- * 
- * 
+ * Author: David Low and Sebastian Brown
+ * Modified: 15 May 2019
+ * Description: A functional test implemented to validate the output of AES encrypt and decrypt.
+ * Notes: The repeats variable can be modified so that multiple random inputs are generated and used to test AES.
  * 
  */
 import java.util.*;
-// import java.io.*;
 
 
 public class Tester {
-
-    // private static cryptMode modeOfOperation;
 
     public static void main(String args[]) {
         System.out.println("");
@@ -23,8 +22,7 @@ public class Tester {
             new AES4(),
         };
         
-       // AES[] algorithms = { new AES1() };
-        int repeats = 100; // The number of times to repeat the tests (with random input)
+        int repeats = 1; // The number of times to repeat the tests (with random input)
         String results = "";
         for (int i=0; i < repeats; i++ ) {
             for (AES algorithm : algorithms) {
@@ -44,11 +42,7 @@ public class Tester {
         try {
            String plaintext = generateBitString(plaintextLength);
             String key = generateBitString(keyLength);
-            //String plaintext = "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
-            //String key = "11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111";
-            
             // Encrypt the plaintext
-            // modeOfOperation = cryptMode.ENCRYPT;
             Application.testLoadData(plaintext,key);
             String[] encryptionResults = Application.processEncryption(algorithm,plaintext,key);
             System.out.println(Arrays.toString(encryptionResults));
@@ -62,7 +56,6 @@ public class Tester {
 
            
             if (plaintext.equals(decryptionResults[decryptionResults.length-1])) {
-                System.out.println("\n \nPASS \n \n");
                 return "PASS";
             } else {
                 System.out.println("\n \nFAIL\n \n");

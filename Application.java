@@ -1,10 +1,12 @@
-
-// Add comments and documentation here
+/**
+ * Author: David Low and Sebastian Brown
+ * Modified: 15 May 2019
+ * Purpose: Utilises an implementation of AES to encrypt and decrypt bitstrings
+ * Notes: The class provides four public methods that may be called.
+ */
 
 import java.util.*;
 import java.io.*;
-
-// import java.math.BigInteger;
 
 enum cryptMode {
     ENCRYPT, DECRYPT
@@ -55,7 +57,6 @@ public class Application {
                
                 generateAnalysis();
 
-                // testEnDec();
             } else if (modeOfOperation == cryptMode.DECRYPT) {
                 processDecryption(new AES0(),rawText,rawKey);
             }
@@ -75,7 +76,9 @@ public class Application {
         }
     }
 
-
+    /**
+     * 
+     */
     public static void generateAnalysis() {
 
         AES[] algorithms = {
@@ -153,10 +156,6 @@ public class Application {
             rawText = textLine;
             rawKey = keyLine;         
 
-            // TODO remove, only needed while testing with hex input
-           // rawText = hexToBinary(textLine);
-          //  rawKey = hexToBinary(keyLine);
-
         } catch (Exception e) {
             throw new Exception(e);
         } finally {
@@ -165,28 +164,6 @@ public class Application {
             }
         }
     }
-
-    // public static void testEnDec() {
-    // System.out.println("TESTING ENC DEC");
-    // AES vanillaAES = new AES0();
-    // String[] encryptedResults = vanillaAES.encrypt(rawText, rawKey);
-    // String[] decryptedResults = vanillaAES.decrypt(encryptedResults[9], rawKey);
-
-    // // System.out.println("Printing results of encryption");
-    // // for (int i = 0; i < encryptedResults.length; i++) {
-    // // System.out.println("Round " + (i + 1) + ": " +
-    // // binaryToHex(encryptedResults[i]));
-    // // }
-
-    // // System.out.println("Printing results of decryption");
-    // // for (int i = 0; i < decryptedResults.length; i++) {
-    // // System.out.println("Round " + (i + 1) + ": " +
-    // // binaryToHex(decryptedResults[i]));
-    // // }
-    // System.out.println("Raw Text: " + binaryToHex(rawText));
-    // System.out.println("Encrypted Text: " + binaryToHex(encryptedResults[9]));
-    // System.out.println("Decrypted Text: " + binaryToHex(decryptedResults[9]));
-    // }
 
     public static String[] processEncryption(AES aes, String plaintext, String key) {
         String[] aesResults = aes.encrypt(plaintext, key);
@@ -321,6 +298,9 @@ public class Application {
         return output;
     }
 
+    /**
+     * flipOneBit is a helper function that takes a bitstring and swaps one bit at index i
+     */
     private static String flipOneBit(int i,String input) {
        char[] charArray = input.toCharArray();
         if (charArray[i] == '0') {
@@ -331,6 +311,9 @@ public class Application {
         return new String(charArray);
     }
 
+    /**
+     * A helper function used to calculate the current system time and return it as a long
+     */
     private static long getTime() {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(new Date());
