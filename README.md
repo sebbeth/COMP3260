@@ -11,8 +11,9 @@ java Application [mode flag] <input file name>
 
 e.g.
 java Application -e input.txt
+java Application -d input.txt
 
 # Authors
 
-David Low - 
+David Low - 3260947
 Sebastian Brown - 3220619

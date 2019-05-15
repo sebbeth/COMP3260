@@ -2,7 +2,9 @@ public class AES4 extends AES {
 
     /**
      * Implements the encryption method that is abstracted in AES. This
-     * implementation follows the standard round specifications for AES.
+     * implementation follows a modified round specifications for AES, where the
+     * add-round-key step is only performed initially, and not as part of the
+     * rounds.
      * 
      * @param plaintext the plaintext block that is to be encrypted.
      * @param key       the cipher key that is to be used to encrypt the plaintext
@@ -21,14 +23,14 @@ public class AES4 extends AES {
             result = substituteBytes(result, S_BOX);
             result = shiftRows(result, Direction.LEFT);
             result = mixColumns(result);
-          //  result = addRoundKey(result, subKeys[i]);
+            // result = addRoundKey(result, subKeys[i]);
             results[i - 1] = result;
         }
 
         // Final round
         result = substituteBytes(result, S_BOX);
         result = shiftRows(result, Direction.LEFT);
-        //result = addRoundKey(result, subKeys[NUM_OF_ROUNDS]);
+        // result = addRoundKey(result, subKeys[NUM_OF_ROUNDS]);
         results[9] = result;
 
         return results;
@@ -36,7 +38,8 @@ public class AES4 extends AES {
 
     /**
      * Implements the decryption method that is abstracted in AES. This
-     * implementation follows the standard round specifications for AES.
+     * implementation follows a modified round specifications for AES, where the
+     * add-round-key step is only performed finally, and not as part of the rounds.
      * 
      * @param plaintext the plaintext block that is to be decrypted.
      * @param key       the cipher key that is to be used to decrypt the plaintext
@@ -48,13 +51,13 @@ public class AES4 extends AES {
         byte[][] results = new byte[16][NUM_OF_ROUNDS];
 
         // Initial Key XOR
-        //byte[] result = addRoundKey(ciphertext, subKeys[NUM_OF_ROUNDS]);
+        // byte[] result = addRoundKey(ciphertext, subKeys[NUM_OF_ROUNDS]);
         byte[] result = ciphertext;
         // 9 rounds
         for (int i = NUM_OF_ROUNDS - 1; i >= 1; i--) {
             result = shiftRows(result, Direction.RIGHT);
             result = substituteBytes(result, INV_S_BOX);
-         //   result = addRoundKey(result, subKeys[i]);
+            // result = addRoundKey(result, subKeys[i]);
             result = invertMixedColumns(result);
             results[9 - i] = result;
         }
