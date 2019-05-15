@@ -9,6 +9,7 @@ public class AES1 extends AES {
      *                  block.
      * @return an array of each result at the end of a round.
      */
+    @Override
     public byte[][] encrypt(byte[] plaintext, byte[] key) {
 
         byte[][] subKeys = generateKeys(key);
@@ -54,7 +55,7 @@ public class AES1 extends AES {
         // 9 rounds
         for (int i = NUM_OF_ROUNDS - 1; i >= 1; i--) {
             result = shiftRows(result, Direction.RIGHT);
-            result = substituteBytes(result, INV_S_BOX);
+           // result = substituteBytes(result, INV_S_BOX);
             result = addRoundKey(result, subKeys[i]);
             result = invertMixedColumns(result);
             results[9 - i] = result;
@@ -62,7 +63,7 @@ public class AES1 extends AES {
 
         // Final round
         result = shiftRows(result, Direction.RIGHT);
-        result = substituteBytes(result, INV_S_BOX);
+       // result = substituteBytes(result, INV_S_BOX);
         result = addRoundKey(result, subKeys[0]);
         results[9] = result;
 

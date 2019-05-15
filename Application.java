@@ -64,7 +64,7 @@ public class Application {
 
                 // testEnDec();
             } else if (modeOfOperation == cryptMode.DECRYPT) {
-                processDecryption();
+                processDecryption(new AES0());
             }
 
         } else {
@@ -112,11 +112,9 @@ public class Application {
             rawKey = keyLine;
 
             // TODO remove, only needed while testing with hex input
-            rawText = hexToBinary(textLine);
-            rawKey = hexToBinary(keyLine);
+           // rawText = hexToBinary(textLine);
+          //  rawKey = hexToBinary(keyLine);
 
-            System.out.println(rawText);
-            System.out.println(rawKey);
         } catch (Exception e) {
             throw new Exception(e);
         } finally {
@@ -156,9 +154,8 @@ public class Application {
         return results;
     }
 
-    public static String[] processDecryption() {
-        AES vanillaAES = new AES0();
-        String[] results = vanillaAES.decrypt(rawText, rawKey);
+    public static String[] processDecryption(AES aes) {
+        String[] results = aes.decrypt(rawText, rawKey);
         outputDecryptionResults(results);
         return results;
     }
@@ -199,6 +196,8 @@ public class Application {
         output += "Key K: " + rawKey + "\n";
         output += "Ciphertext C: " + "\n";
         output += results[0][results[0].length-1] + "\n";
+          output += "Ciphertext AES1 C: " + "\n";
+        output += results[1][results[1].length-1] + "\n";
         output += "Running time: " + (endTime - startTime) + " milliseconds.\n";
         output += "Avalanche:\nP and Pi under K\n";
 

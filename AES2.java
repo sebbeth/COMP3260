@@ -52,7 +52,7 @@ public class AES2 extends AES {
 
         // 9 rounds
         for (int i = NUM_OF_ROUNDS - 1; i >= 1; i--) {
-            result = shiftRows(result, Direction.RIGHT);
+          //  result = shiftRows(result, Direction.RIGHT);
             result = substituteBytes(result, INV_S_BOX);
             result = addRoundKey(result, subKeys[i]);
             result = invertMixedColumns(result);
@@ -60,7 +60,7 @@ public class AES2 extends AES {
         }
 
         // Final round
-        result = shiftRows(result, Direction.RIGHT);
+      //  result = shiftRows(result, Direction.RIGHT);
         result = substituteBytes(result, INV_S_BOX);
         result = addRoundKey(result, subKeys[0]);
         results[9] = result;

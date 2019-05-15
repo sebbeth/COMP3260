@@ -54,7 +54,7 @@ public class AES4 extends AES {
         for (int i = NUM_OF_ROUNDS - 1; i >= 1; i--) {
             result = shiftRows(result, Direction.RIGHT);
             result = substituteBytes(result, INV_S_BOX);
-            result = addRoundKey(result, subKeys[i]);
+         //   result = addRoundKey(result, subKeys[i]);
             result = invertMixedColumns(result);
             results[9 - i] = result;
         }
@@ -62,7 +62,7 @@ public class AES4 extends AES {
         // Final round
         result = shiftRows(result, Direction.RIGHT);
         result = substituteBytes(result, INV_S_BOX);
-        result = addRoundKey(result, subKeys[0]);
+     //   result = addRoundKey(result, subKeys[0]);
         results[9] = result;
 
         return results;

@@ -55,7 +55,7 @@ public class AES3 extends AES {
             result = shiftRows(result, Direction.RIGHT);
             result = substituteBytes(result, INV_S_BOX);
             result = addRoundKey(result, subKeys[i]);
-            result = invertMixedColumns(result);
+         //   result = invertMixedColumns(result);
             results[9 - i] = result;
         }
 
